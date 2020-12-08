@@ -1,0 +1,71 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="someUniqueId" author="Andranik">
+        <sql>CREATE TYPE order_status AS ENUM ('OPEN','CANCELLED','CLOSED')</sql>
+        <sql>CREATE TYPE table_type AS ENUM ('OPEN_AIR','CLOSE_AIR')</sql>
+        <sql>CREATE TYPE user_type AS ENUM ('MANAGER','WAITER')</sql>
+
+        <createTable tableName="user">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="username" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_type" type="user_type"/>
+            <column name="dob" type="date"/>
+        </createTable>
+
+        <createTable tableName="table">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="table_type" type="table_type">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints foreignKeyName="fk_table_user" references="user(id)"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="order">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="order_status" type="order_status"/>
+            <column name="table_id"  type="BIGINT">
+                <constraints foreignKeyName="fk_order_table" references="table(id)"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="product">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(150)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="decimal"/>
+        </createTable>
+
+        <createTable tableName="product_in_order">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="orders_id" type="BIGINT">
+                <constraints primaryKey="true" foreignKeyName="fk_product_in_order" references="order(id)"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints primaryKey="true" foreignKeyName="fk_product_in_order_product" references="product(id)"/>
+            </column>
+            <column name="amount" type="decimal"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
